@@ -28,9 +28,18 @@ class EthereumDriver extends AbstractDriver implements HasTokens
     {
         parent::__construct($config, $network, $alias, $app);
 
+        $defaultRpc = $this->getNetwork() === 'testnet'
+            ? 'https://ethereum-sepolia-rpc.publicnode.com'
+            : 'http://127.0.0.1:8545';
+
+        $rpcUrl = $this->getConfig('rpc_url');
+        if (empty($rpcUrl) || $rpcUrl === 'http://127.0.0.1:8545') {
+            $rpcUrl = $defaultRpc;
+        }
+
         $this->rpc = new Web3Adapter(
-            rpcUrl: $this->getConfig('rpc_url', 'http://127.0.0.1:8545'),
-            chainId: (int) $this->getConfig('chain_id', 1),
+            rpcUrl: $rpcUrl,
+            chainId: (int) $this->getConfig('chain_id', $this->getNetwork() === 'testnet' ? 11155111 : 1),
         );
     }
 
@@ -336,7 +345,25 @@ class EthereumDriver extends AbstractDriver implements HasTokens
 
     public function isConnected(): bool
     {
-        return $this->rpc->isConnected();
+        try {
+            return $this->rpc->isConnected();
+        } catch (\Throwable) {
+            try {
+                $client = new \GuzzleHttp\Client(['timeout' => 3.0]);
+                // Query public RPC status
+                $response = $client->post($this->rpc->getRpcUrl(), [
+                    'json' => [
+                        'jsonrpc' => '2.0',
+                        'method' => 'eth_blockNumber',
+                        'params' => [],
+                        'id' => 1,
+                    ],
+                ]);
+                return $response->getStatusCode() === 200;
+            } catch (\Throwable) {
+                return false;
+            }
+        }
     }
 
     // ── Private Helpers ─────────────────────────────────────────────────

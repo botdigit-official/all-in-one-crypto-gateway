@@ -26,8 +26,17 @@ class BitcoinDriver extends AbstractDriver
     {
         parent::__construct($config, $network, $alias, $app);
 
+        $defaultHost = $this->getNetwork() === 'testnet'
+            ? 'https://blockstream.info/testnet/api'
+            : 'http://127.0.0.1:8332';
+
+        $host = $this->getConfig('host');
+        if (empty($host) || $host === 'http://127.0.0.1:8332' || $host === 'http://127.0.0.1:18332') {
+            $host = $defaultHost;
+        }
+
         $this->rpc = new JsonRpcAdapter(
-            host: $this->getConfig('host', 'http://127.0.0.1:8332'),
+            host: $host,
             user: $this->getConfig('user'),
             password: $this->getConfig('password'),
         );

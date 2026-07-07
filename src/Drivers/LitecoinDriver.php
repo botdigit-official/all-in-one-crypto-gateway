@@ -27,8 +27,17 @@ class LitecoinDriver extends AbstractDriver
     {
         parent::__construct($config, $network, $alias, $app);
 
+        $defaultHost = $this->getNetwork() === 'testnet'
+            ? 'https://litecoinspace.org/api'
+            : 'http://127.0.0.1:9332';
+
+        $host = $this->getConfig('host');
+        if (empty($host) || $host === 'http://127.0.0.1:9332' || $host === 'http://127.0.0.1:19332') {
+            $host = $defaultHost;
+        }
+
         $this->rpc = new JsonRpcAdapter(
-            host: $this->getConfig('host', 'http://127.0.0.1:9332'),
+            host: $host,
             user: $this->getConfig('user'),
             password: $this->getConfig('password'),
         );
