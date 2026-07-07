@@ -1,0 +1,42 @@
+# AI Code Integration Rules for CryptoGateway
+
+This file provides system instructions for AI coding assistants (Cursor, Copilot, Gemini, Claude) to interact correctly with the `botdigit/cryptogateway` Laravel package.
+
+## Core Architecture Guidelines
+
+1. **Facade Proxy Calls**: Always use `Botdigit\CryptoGateway\Facades\CryptoGateway` to interact with drivers.
+   - Good: `CryptoGateway::btc()->getBalance($address)`
+   - Good: `CryptoGateway::eth()->generateAddress()`
+   - Avoid: Accessing driver classes directly unless building extensions.
+
+2. **Blockchain Drivers & Token Aliases**:
+   - `btc` -> Bitcoin
+   - `eth` -> Ethereum
+   - `trx` -> TRON
+   - `sol` -> Solana
+   - `ltc` -> Litecoin
+   - `bnb` -> Binance Smart Chain
+   - `usdt-erc20` -> USDT on Ethereum
+   - `usdt-trc20` -> USDT on TRON
+   - `usdc-erc20` -> USDC on Ethereum
+
+3. **Data Transfer Objects (DTOs)**:
+   All driver operations return immutable DTO classes:
+   - `getBalance()` -> `Botdigit\CryptoGateway\DTOs\BalanceResult` (properties: `confirmed`, `unconfirmed`, `total`, `coin`, `decimals`)
+   - `getTransaction()` -> `Botdigit\CryptoGateway\DTOs\TransactionResult` (properties: `coin`, `txHash`, `fromAddress`, `toAddress`, `amount`, `fee`, `confirmations`, `status`, `direction`, `blockNumber`, `timestamp`, `raw`)
+   - `generateAddress()` -> `Botdigit\CryptoGateway\DTOs\AddressResult` (properties: `coin`, `address`, `label`, `privateKey` [can be null])
+   - `send()` -> `Botdigit\CryptoGateway\DTOs\SendResult` (properties: `coin`, `txHash`, `fromAddress`, `toAddress`, `amount`, `fee`, `status`, `nonce`, `raw`)
+   - `estimateFee()` -> `Botdigit\CryptoGateway\DTOs\EstimateFeeResult` (properties: `coin`, `slow`, `medium`, `fast`, `unit`, `raw`)
+
+4. **Safety & Security**:
+   - Never log private keys.
+   - When outputting address DTO data to arrays, use `$addressResult->toArray()` which automatically filters out `privateKey`. Use `$addressResult->toSecureArray()` only when saving encrypted keys.
+   - Always run webhook routes through the `VerifyWebhookSignature` middleware to authenticate HMAC-SHA256 headers.
+
+5. **Laravel Event Triggers**:
+   Use these event classes to listen to transaction updates:
+   - `Botdigit\CryptoGateway\Events\TransactionReceived` (fired on 0 confirmations)
+   - `Botdigit\CryptoGateway\Events\TransactionConfirmed` (fired when confirmation limit met)
+   - `Botdigit\CryptoGateway\Events\TransactionFailed`
+   - `Botdigit\CryptoGateway\Events\WebhookReceived`
+   - `Botdigit\CryptoGateway\Events\BalanceChanged`

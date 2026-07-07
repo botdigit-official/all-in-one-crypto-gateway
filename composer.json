@@ -1,20 +1,23 @@
 {
     "name": "botdigit/cryptogateway",
-    "description": "Open-source all-in-one cryptocurrency payment gateway for Laravel. One Facade, every coin, zero complexity.",
+    "description": "An open-source all-in-one cryptocurrency payment gateway package for Laravel supporting BTC, ETH, TRX, SOL, LTC, BNB, USDT, and USDC.",
     "keywords": [
         "laravel",
-        "crypto",
         "cryptocurrency",
+        "payment-gateway",
         "bitcoin",
         "ethereum",
-        "tron",
-        "solana",
-        "payment",
-        "gateway",
-        "blockchain",
-        "wallet",
         "usdt",
-        "web3"
+        "solana",
+        "tron",
+        "blockchain",
+        "composer-package",
+        "crypto-payments",
+        "web3-laravel",
+        "erc20",
+        "trc20",
+        "litecoin",
+        "bnb"
     ],
     "license": "MIT",
     "authors": [
