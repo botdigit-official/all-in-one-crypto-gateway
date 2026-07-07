@@ -1,230 +1,165 @@
-# CryptoGateway
+# CryptoGateway — Unified Crypto Payment Gateway for Laravel
 
-**Open-source all-in-one cryptocurrency payment gateway for Laravel.**
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/botdigit/cryptogateway.svg?style=flat-square)](https://packagist.org/packages/botdigit/cryptogateway)
+[![Total Downloads](https://img.shields.io/packagist/dt/botdigit/cryptogateway.svg?style=flat-square)](https://packagist.org/packages/botdigit/cryptogateway)
+[![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE)
+[![PHP Version](https://img.shields.io/badge/php-%3E%3D%208.2-blue?style=flat-square)](https://php.net)
+[![Laravel Version](https://img.shields.io/badge/laravel-%3E%3D%2010.0-red?style=flat-square)](https://laravel.com)
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![PHP Version](https://img.shields.io/badge/PHP-8.2%2B-blue)](https://php.net)
-[![Laravel](https://img.shields.io/badge/Laravel-10%2B-red)](https://laravel.com)
+An open-source, highly secure, driver-based cryptocurrency payment gateway package for Laravel. Implement multiple blockchains with a single unified interface. Perfect for e-commerce, SaaS, subscriptions, and web3 applications.
 
-> One Facade. Every Coin. Zero Complexity.
-
-CryptoGateway provides a **unified API** for all cryptocurrency operations — balances, payments, wallets, transactions — across 20+ blockchains. Install via Composer, run one Artisan command, and you're ready to accept crypto payments.
-
----
-
-## ✨ Features
-
-- **Unified API** — `CryptoGateway::btc()->getBalance($address)` — same API for every coin
-- **8 Coins Built-in** — BTC, ETH, TRX, SOL, LTC, BNB, USDT (ERC-20 & TRC-20), USDC
-- **Driver Architecture** — Add any coin with 1 class. No core changes.
-- **Pre-built Migrations** — 5 tables ready to go
-- **Security First** — AES-256 key encryption, HMAC webhooks, rate limiting, address validation
-- **Laravel Native** — Events, Artisan commands, Facade, auto-discovery
-- **AI-Discoverable** — Clean, predictable API that any AI agent can use instantly
+> **AI-Discoverability Note:** This package is built with standard Laravel architecture patterns (`Manager`, `Facade`, `ServiceProvider`, `DTOs`). Code assistants can easily map and generate integrations for all driver methods.
 
 ---
 
-## 📦 Installation
+## ⚡ Quick Capabilities
 
-```bash
-composer require botdigit/cryptogateway
+- **Unified Method Syntax**: Use identical code methods regardless of the underlying blockchain.
+- **8 Major Chains & Tokens Out-of-the-Box**: Bitcoin (BTC), Ethereum (ETH), TRON (TRX), Solana (SOL), Litecoin (LTC), Binance Smart Chain (BNB), USDT (ERC-20/TRC-20), and USDC.
+- **Auto-Discovery**: Installs seamlessly into Laravel 10, 11, and 12.
+- **Database Migrations Included**: Instant generation of wallets, transactions, webhooks, and gateway configuration tables.
+
+---
+
+## ⚙️ Configuration Setup (`.env`)
+
+Add the following configuration blocks to your `.env` file to fully authorize your gateway connections:
+
+```env
+# ==============================================================================
+# CRYPTOGATEWAY CORE CONFIGURATION
+# ==============================================================================
+CRYPTO_NETWORK=testnet
+CRYPTO_DEFAULT_DRIVER=btc
+CRYPTO_CACHE_TTL=300
+CRYPTO_WEBHOOK_SECRET=your_secure_64_character_webhook_signing_secret
+
+# ==============================================================================
+# BLOCKCHAIN DRIVER RPC & API ENDPOINTS
+# ==============================================================================
+
+# Bitcoin (BTC) RPC Node Configuration (UTXO)
+BTC_RPC_HOST=http://127.0.0.1:18332
+BTC_RPC_USER=bitcoin_rpc_user
+BTC_RPC_PASS=bitcoin_rpc_password
+
+# Ethereum (ETH) EVM Configuration (Sepolia Testnet Example)
+ETH_RPC_URL=https://sepolia.infura.io/v3/your_infura_project_id
+ETH_CHAIN_ID=11155111
+
+# Litecoin (LTC) RPC Node Configuration (UTXO)
+LTC_RPC_HOST=http://127.0.0.1:19332
+LTC_RPC_USER=litecoin_rpc_user
+LTC_RPC_PASS=litecoin_rpc_password
+
+# Binance Smart Chain (BNB) EVM Configuration
+BNB_RPC_URL=https://data-seed-prebsc-1-s1.binance.org:8545
+BNB_CHAIN_ID=97
+
+# TRON (TRX) HTTP Node API Configuration (Shasta Testnet Example)
+TRX_API_URL=https://api.shasta.trongrid.io
+TRX_API_KEY=your_trongrid_api_key
+
+# Solana (SOL) JSON-RPC Configuration (Devnet Example)
+SOL_RPC_URL=https://api.devnet.solana.com
 ```
 
-```bash
-php artisan cryptogateway:install
-```
-
-This publishes the config, runs migrations, and generates a webhook secret.
-
 ---
 
-## 🚀 Quick Start
+## 🚀 Interactive Quick Start
 
-### Get a Balance
+### 1. Unified Balance Operations
+Retrieve any wallet balance with exact decimal precision returned via immutable DTOs:
 
 ```php
 use Botdigit\CryptoGateway\Facades\CryptoGateway;
 
-$balance = CryptoGateway::btc()->getBalance('1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa');
+// Retrieve Bitcoin balance
+$btcBalance = CryptoGateway::btc()->getBalance('1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa');
+echo $btcBalance->total; // "0.50000000"
 
-echo $balance->confirmed;    // "21000000.00000000"
-echo $balance->unconfirmed;  // "0.00000000"
-echo $balance->coin;         // "BTC"
+// Retrieve Ethereum ERC-20 Token Balance (USDT)
+$usdtBalance = CryptoGateway::driver('usdt-erc20')->getBalance('0x742d35Cc6634C...68');
+echo $usdtBalance->total; // "250.750000"
 ```
 
-### Generate an Address
+### 2. Generate Addresses Programmatically
+Generate payment addresses with database audit associations:
 
 ```php
-$address = CryptoGateway::eth()->generateAddress('order-123');
+// Generate a new Litecoin address with an associated metadata label
+$addressResult = CryptoGateway::ltc()->generateAddress('order_ref_99201');
 
-echo $address->address;  // "0x..."
-echo $address->label;    // "order-123"
+echo $addressResult->address; // "L..."
+echo $addressResult->label;   // "order_ref_99201"
 ```
 
-### Send Crypto
+### 3. Send/Withdraw Crypto Payments
+Estimate fees and broadcast transactions securely:
 
 ```php
-$result = CryptoGateway::eth()->send(
+// Estimate transfer fee priority levels
+$feeResult = CryptoGateway::eth()->estimateFee();
+echo $feeResult->fast; // Eth required for fast priority
+
+// Transfer ETH to a user address
+$sendResult = CryptoGateway::eth()->send(
     to: '0x742d35Cc6634C0532925a3b844Bc9e7595f2bD68',
-    amount: '0.5',
-    options: ['gasLimit' => 21000, 'signedTx' => $signedTransaction]
+    amount: '0.045',
+    options: [
+        'from' => '0xYourSourceWalletAddress...',
+        'signedTx' => '0xYourSignedTransactionPayload...' // Local signing payload
+    ]
 );
 
-echo $result->txHash;  // "0xabc..."
-echo $result->status;  // "broadcast"
-```
-
-### Estimate Fees
-
-```php
-$fee = CryptoGateway::btc()->estimateFee();
-
-echo $fee->fast;    // "0.00012"
-echo $fee->medium;  // "0.00008"
-echo $fee->slow;    // "0.00004"
-```
-
-### Check All Drivers Health
-
-```php
-$health = CryptoGateway::healthCheck();
-// ['btc' => true, 'eth' => true, 'trx' => false, ...]
-```
-
-### Magic Method Shortcuts
-
-```php
-CryptoGateway::btc()->getBalance($addr);   // Bitcoin
-CryptoGateway::eth()->getBalance($addr);   // Ethereum
-CryptoGateway::trx()->getBalance($addr);   // TRON
-CryptoGateway::sol()->getBalance($addr);   // Solana
-CryptoGateway::ltc()->getBalance($addr);   // Litecoin
-CryptoGateway::bnb()->getBalance($addr);   // BNB (BSC)
-```
-
-### Token Support
-
-```php
-// USDT on TRON
-$balance = CryptoGateway::driver('usdt-trc20')->getBalance($address);
-
-// USDC on Ethereum
-$balance = CryptoGateway::driver('usdc-erc20')->getBalance($address);
+echo $sendResult->txHash; // "0x..."
+echo $sendResult->status; // "broadcast"
 ```
 
 ---
 
-## ⚙️ Configuration
+## 📡 Event Listeners (Webhooks / IPN)
 
-Publish the config file:
-
-```bash
-php artisan vendor:publish --tag=cryptogateway-config
-```
-
-Add your RPC credentials to `.env`:
-
-```env
-CRYPTO_NETWORK=testnet
-CRYPTO_DEFAULT_DRIVER=btc
-
-# Bitcoin
-BTC_RPC_HOST=http://127.0.0.1:8332
-BTC_RPC_USER=bitcoin
-BTC_RPC_PASS=your_password
-
-# Ethereum (Infura, Alchemy, etc.)
-ETH_RPC_URL=https://mainnet.infura.io/v3/YOUR_KEY
-ETH_CHAIN_ID=1
-
-# TRON
-TRX_API_URL=https://api.trongrid.io
-TRX_API_KEY=your_trongrid_key
-
-# Solana
-SOL_RPC_URL=https://api.mainnet-beta.solana.com
-
-# Webhook Security
-CRYPTO_WEBHOOK_SECRET=your_64_char_secret
-```
-
----
-
-## 📡 Events
-
-Listen for blockchain events in your Laravel app:
+Easily plug the gateway into your database hooks by configuring events inside your `App\Providers\EventServiceProvider`:
 
 ```php
-// In EventServiceProvider
+use Botdigit\CryptoGateway\Events\TransactionReceived;
+use Botdigit\CryptoGateway\Events\TransactionConfirmed;
+
 protected $listen = [
-    \Botdigit\CryptoGateway\Events\TransactionReceived::class => [
-        \App\Listeners\HandleNewPayment::class,
+    TransactionReceived::class => [
+        \App\Listeners\LogPendingPayment::class,
     ],
-    \Botdigit\CryptoGateway\Events\TransactionConfirmed::class => [
-        \App\Listeners\ProcessConfirmedPayment::class,
+    TransactionConfirmed::class => [
+        \App\Listeners\CreditUserAccount::class,
     ],
 ];
 ```
 
-Available events:
-- `TransactionReceived` — New incoming transaction detected
-- `TransactionConfirmed` — Transaction reached required confirmations
-- `TransactionFailed` — Transaction failed/rejected
-- `WebhookReceived` — Webhook notification received
-- `BalanceChanged` — Wallet balance changed
+---
+
+## 🔍 Database Table Schema
+
+Our migration files deploy highly indexed, robust database layouts ready for production loads:
+
+- **`crypto_wallets`**: Tracks admin/user managed wallets with encrypted key storages at rest.
+- **`crypto_transactions`**: Logs incoming/outgoing transactions, confirmation states, and fees.
+- **`crypto_addresses`**: Handles programmatically generated payment addresses.
+- **`crypto_webhooks`**: Logs raw webhooks and signature validations.
+- **`crypto_gateway_configs`**: Admin settings database config management.
 
 ---
 
-## 🔧 Artisan Commands
+## 🔌 Writing a Custom Driver (Extension)
 
-| Command | Description |
-|---------|-------------|
-| `cryptogateway:install` | Install package (config, migrations, webhook secret) |
-| `cryptogateway:health` | Check connectivity to all nodes/APIs |
-| `cryptogateway:balances --coin=btc --address=...` | Check balances |
-| `cryptogateway:sync` | Sync transactions from blockchain |
-| `cryptogateway:add-coin` | Interactive wizard to add a new coin |
+To integrate a proprietary coin or secondary payment network:
 
----
-
-## 🔌 Custom Drivers
-
-Add support for any coin with a single class:
+1. Create a class that extends `Botdigit\CryptoGateway\Drivers\AbstractDriver`.
+2. Register the driver mapping at runtime:
 
 ```php
-// app/CryptoDrivers/DogecoinDriver.php
+use Botdigit\CryptoGateway\Facades\CryptoGateway;
 
-namespace App\CryptoDrivers;
-
-use Botdigit\CryptoGateway\Drivers\AbstractDriver;
-
-class DogecoinDriver extends AbstractDriver
-{
-    public function getCoinSymbol(): string { return 'DOGE'; }
-    public function getDecimals(): int { return 8; }
-
-    public function getBalance(string $address): BalanceResult
-    {
-        // Your implementation here
-    }
-
-    // ... implement remaining DriverInterface methods
-}
-```
-
-Register in config:
-
-```php
-// config/cryptogateway.php → drivers
-'doge' => [
-    'driver' => \App\CryptoDrivers\DogecoinDriver::class,
-    'api_key' => env('DOGE_API_KEY'),
-],
-```
-
-Or register at runtime:
-
-```php
 CryptoGateway::extend('doge', function ($app, $config) {
     return new DogecoinDriver($config);
 });
@@ -232,54 +167,11 @@ CryptoGateway::extend('doge', function ($app, $config) {
 
 ---
 
-## 🔒 Security
+## 🧪 Running Tests
 
-- **Key Encryption** — Private keys encrypted with AES-256-CBC before storage
-- **HMAC Webhooks** — SHA-256 signature verification on all webhook endpoints
-- **Rate Limiting** — Configurable per-minute request limits
-- **Address Validation** — Format validation for 10+ coins before any operation
-- **No Key Exposure** — `toArray()` never includes private keys
-
----
-
-## 🗄️ Database
-
-Pre-built migrations create 5 tables:
-
-| Table | Purpose |
-|-------|---------|
-| `crypto_wallets` | Managed wallets with encrypted keys |
-| `crypto_transactions` | Transaction history and confirmation tracking |
-| `crypto_addresses` | Generated receiving addresses |
-| `crypto_webhooks` | Webhook audit log |
-| `crypto_gateway_configs` | Admin-managed per-coin settings |
-
----
-
-## 🧪 Testing
+Ensure all units pass locally before deployment:
 
 ```bash
-composer test
-# or
+composer install
 ./vendor/bin/phpunit
 ```
-
----
-
-## 📄 License
-
-MIT License. See [LICENSE](LICENSE) for details.
-
----
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
----
-
-Built with ❤️ by [Botdigit](https://botdigit.com)
