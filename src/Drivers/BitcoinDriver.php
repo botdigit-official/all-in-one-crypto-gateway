@@ -221,7 +221,23 @@ class BitcoinDriver extends AbstractDriver
 
     public function isConnected(): bool
     {
-        return $this->rpc->isConnected();
+        try {
+            // First attempt: direct JSON-RPC call
+            return $this->rpc->isConnected();
+        } catch (\Throwable) {
+            // Fallback for check health: Ping public blockchain status API
+            try {
+                $client = new \GuzzleHttp\Client(['timeout' => 3.0]);
+                $url = $this->getNetwork() === 'testnet' 
+                    ? 'https://blockstream.info/testnet/api/blocks/tip/height'
+                    : 'https://blockstream.info/api/blocks/tip/height';
+                
+                $response = $client->get($url);
+                return $response->getStatusCode() === 200;
+            } catch (\Throwable) {
+                return false;
+            }
+        }
     }
 
     // ── Private Helpers ─────────────────────────────────────────────────

@@ -36,40 +36,40 @@ return [
 
         'btc' => [
             'driver'        => 'bitcoin',
-            'host'          => env('BTC_RPC_HOST', 'http://127.0.0.1:8332'),
+            'host'          => env('BTC_RPC_HOST', 'http://127.0.0.1:18332'),
             'user'          => env('BTC_RPC_USER', 'bitcoin'),
             'password'      => env('BTC_RPC_PASS', ''),
-            'provider'      => env('BTC_PROVIDER'),      // 'getblock', 'chainstack', null (self-hosted)
+            'provider'      => env('BTC_PROVIDER'),
             'api_key'       => env('BTC_API_KEY'),
             'confirmations' => 3,
-            'network'       => null,                      // null = use global
+            'network'       => null,
         ],
 
         'eth' => [
             'driver'   => 'ethereum',
-            'rpc_url'  => env('ETH_RPC_URL', 'https://mainnet.infura.io/v3/YOUR_KEY'),
+            'rpc_url'  => env('ETH_RPC_URL', 'https://ethereum-sepolia-rpc.publicnode.com'),
             'api_key'  => env('ETH_API_KEY'),
-            'chain_id' => env('ETH_CHAIN_ID', 1),
+            'chain_id' => env('ETH_CHAIN_ID', 11155111),
             'network'  => null,
         ],
 
         'trx' => [
             'driver'  => 'tron',
-            'api_url' => env('TRX_API_URL', 'https://api.trongrid.io'),
+            'api_url' => env('TRX_API_URL', 'https://api.shasta.trongrid.io'),
             'api_key' => env('TRX_API_KEY'),
             'network' => null,
         ],
 
         'sol' => [
             'driver'  => 'solana',
-            'rpc_url' => env('SOL_RPC_URL', 'https://api.mainnet-beta.solana.com'),
+            'rpc_url' => env('SOL_RPC_URL', 'https://api.devnet.solana.com'),
             'api_key' => env('SOL_API_KEY'),
             'network' => null,
         ],
 
         'ltc' => [
             'driver'   => 'litecoin',
-            'host'     => env('LTC_RPC_HOST', 'http://127.0.0.1:9332'),
+            'host'     => env('LTC_RPC_HOST', 'http://127.0.0.1:19332'),
             'user'     => env('LTC_RPC_USER', 'litecoin'),
             'password' => env('LTC_RPC_PASS', ''),
             'network'  => null,
@@ -77,9 +77,9 @@ return [
 
         'bnb' => [
             'driver'   => 'bnb',
-            'rpc_url'  => env('BNB_RPC_URL', 'https://bsc-dataseed.binance.org'),
+            'rpc_url'  => env('BNB_RPC_URL', 'https://data-seed-prebsc-1-s1.binance.org:8545'),
             'api_key'  => env('BNB_API_KEY'),
-            'chain_id' => 56,
+            'chain_id' => 97,
             'network'  => null,
         ],
 

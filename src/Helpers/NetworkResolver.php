@@ -13,11 +13,11 @@ class NetworkResolver
      * Default testnet endpoints for built-in coins.
      */
     protected static array $testnetEndpoints = [
-        'btc' => 'http://127.0.0.1:18332',
-        'eth' => 'https://sepolia.infura.io/v3/',
+        'btc' => 'https://blockstream.info/testnet/api', // Public Blockstream REST API fallback
+        'eth' => 'https://ethereum-sepolia-rpc.publicnode.com', // Public Sepolia RPC
         'trx' => 'https://api.shasta.trongrid.io',
         'sol' => 'https://api.devnet.solana.com',
-        'ltc' => 'http://127.0.0.1:19332',
+        'ltc' => 'https://litecoin-testnet.rpc.blockdaemon.com', // Public LTC testnet
         'bnb' => 'https://data-seed-prebsc-1-s1.binance.org:8545',
     ];
 
