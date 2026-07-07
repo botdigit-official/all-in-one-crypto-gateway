@@ -1,0 +1,84 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\CryptoDrivers;
+
+use Botdigit\CryptoGateway\Drivers\AbstractDriver;
+use Botdigit\CryptoGateway\DTOs\AddressResult;
+use Botdigit\CryptoGateway\DTOs\BalanceResult;
+use Botdigit\CryptoGateway\DTOs\EstimateFeeResult;
+use Botdigit\CryptoGateway\DTOs\SendResult;
+use Botdigit\CryptoGateway\DTOs\TransactionResult;
+
+/**
+ * Custom driver template for {{ COIN_NAME }}.
+ *
+ * Implement each method to connect to your blockchain node or API.
+ *
+ * Register in config/cryptogateway.php:
+ *   '{{ coin_symbol_lower }}' => [
+ *       'driver' => \App\CryptoDrivers\{{ ClassName }}::class,
+ *       'api_key' => env('{{ COIN_UPPER }}_API_KEY'),
+ *   ],
+ */
+class {{ ClassName }} extends AbstractDriver
+{
+    public function getCoinSymbol(): string
+    {
+        return '{{ COIN_SYMBOL }}';
+    }
+
+    public function getDecimals(): int
+    {
+        return 8; // Adjust for your coin
+    }
+
+    public function generateAddress(?string $label = null): AddressResult
+    {
+        // TODO: Implement address generation
+        throw new \RuntimeException('Not implemented: generateAddress');
+    }
+
+    public function validateAddress(string $address): bool
+    {
+        // TODO: Implement address validation
+        return strlen($address) > 0;
+    }
+
+    public function getBalance(string $address): BalanceResult
+    {
+        // TODO: Implement balance lookup
+        throw new \RuntimeException('Not implemented: getBalance');
+    }
+
+    public function getTransaction(string $txHash): TransactionResult
+    {
+        // TODO: Implement transaction lookup
+        throw new \RuntimeException('Not implemented: getTransaction');
+    }
+
+    public function getTransactions(string $address, int $limit = 50, int $offset = 0): array
+    {
+        // TODO: Implement transaction history
+        return [];
+    }
+
+    public function send(string $to, string $amount, array $options = []): SendResult
+    {
+        // TODO: Implement sending
+        throw new \RuntimeException('Not implemented: send');
+    }
+
+    public function estimateFee(?string $to = null, ?string $amount = null): EstimateFeeResult
+    {
+        // TODO: Implement fee estimation
+        return EstimateFeeResult::flat($this->getCoinSymbol(), '0.001');
+    }
+
+    public function isConnected(): bool
+    {
+        // TODO: Implement health check
+        return false;
+    }
+}
