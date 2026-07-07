@@ -8,6 +8,8 @@
 
 An open-source, highly secure, driver-based cryptocurrency payment gateway package for Laravel. Implement multiple blockchains with a single unified interface. Perfect for e-commerce, SaaS, subscriptions, and web3 applications.
 
+> **💡 Zero-Config Testnet Fallback:** If `CRYPTO_NETWORK=testnet` (default), the package automatically redirects BTC, ETH, and LTC requests to public block explorers and public RPC nodes. You do not need to configure any credentials to test connectivity out-of-the-box!
+
 > **AI-Discoverability Note:** This package is built with standard Laravel architecture patterns (`Manager`, `Facade`, `ServiceProvider`, `DTOs`). Code assistants can easily map and generate integrations for all driver methods.
 
 ---
@@ -23,34 +25,34 @@ An open-source, highly secure, driver-based cryptocurrency payment gateway packa
 
 ## ⚙️ Configuration Setup (`.env`)
 
-Add the following configuration blocks to your `.env` file to fully authorize your gateway connections:
+Add the configuration blocks to your `.env` file. For **local development / testing**, you can leave these commented out to use the built-in public fallback nodes. For **production**, specify your node endpoints:
 
 ```env
 # ==============================================================================
 # CRYPTOGATEWAY CORE CONFIGURATION
 # ==============================================================================
-CRYPTO_NETWORK=testnet
+CRYPTO_NETWORK=testnet # 'testnet' (uses public fallback nodes automatically) or 'mainnet'
 CRYPTO_DEFAULT_DRIVER=btc
 CRYPTO_CACHE_TTL=300
 CRYPTO_WEBHOOK_SECRET=your_secure_64_character_webhook_signing_secret
 
 # ==============================================================================
-# BLOCKCHAIN DRIVER RPC & API ENDPOINTS
+# BLOCKCHAIN DRIVER RPC & API ENDPOINTS (Optional for Testnet, Required for Mainnet)
 # ==============================================================================
 
-# Bitcoin (BTC) RPC Node Configuration (UTXO)
-BTC_RPC_HOST=http://127.0.0.1:18332
-BTC_RPC_USER=bitcoin_rpc_user
-BTC_RPC_PASS=bitcoin_rpc_password
+# Bitcoin (BTC) RPC Node Configuration
+# BTC_RPC_HOST=http://127.0.0.1:18332
+# BTC_RPC_USER=bitcoin_rpc_user
+# BTC_RPC_PASS=bitcoin_rpc_password
 
-# Ethereum (ETH) EVM Configuration (Sepolia Testnet Example)
-ETH_RPC_URL=https://sepolia.infura.io/v3/your_infura_project_id
-ETH_CHAIN_ID=11155111
+# Ethereum (ETH) EVM Configuration
+# ETH_RPC_URL=https://sepolia.infura.io/v3/your_infura_project_id
+# ETH_CHAIN_ID=11155111
 
-# Litecoin (LTC) RPC Node Configuration (UTXO)
-LTC_RPC_HOST=http://127.0.0.1:19332
-LTC_RPC_USER=litecoin_rpc_user
-LTC_RPC_PASS=litecoin_rpc_password
+# Litecoin (LTC) RPC Node Configuration
+# LTC_RPC_HOST=http://127.0.0.1:19332
+# LTC_RPC_USER=litecoin_rpc_user
+# LTC_RPC_PASS=litecoin_rpc_password
 
 # Binance Smart Chain (BNB) EVM Configuration
 BNB_RPC_URL=https://data-seed-prebsc-1-s1.binance.org:8545
